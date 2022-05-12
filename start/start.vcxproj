@@ -72,12 +72,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\3rd-party\OpenGL_FW\include;$(IncludePath)</IncludePath>
+    <IncludePath>E:\code\VisualStudio\OpenGL_learn\start\include;D:\3rd-party\OpenGL_FW\include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\3rd-party\OpenGL_FW\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>D:\3rd-party\OpenGL_FW\include;$(IncludePath)</IncludePath>
+    <IncludePath>E:\code\VisualStudio\OpenGL_learn\start\include;D:\3rd-party\OpenGL_FW\include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\3rd-party\OpenGL_FW\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -153,8 +153,8 @@
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="Shader.h" />
-    <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
