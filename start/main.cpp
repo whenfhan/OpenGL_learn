@@ -20,16 +20,14 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 constexpr int screenWidth = 800;
 constexpr int screenHeight = 600;
 
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
 float deltaTime = 0.0f; // 与上一帧的时间差
 float lastFrame = 0.0f; // 上一帧的时间
 
 bool firstMouse = true;
 float lastX = 400, lastY = 300; // 上一张鼠标位置
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f); // 光源世界坐标系中的位置
 
 int main()
 {
@@ -63,6 +61,7 @@ int main()
 
 	// 封装类
 	Shader shader("shader_source/shader.vs", "shader_source/shader.fs");
+	Shader lightShader("shader_source/shader.vs", "shader_source/lightShader.fs");
 
 	// 顶点数据
 	float vertices[] = {
@@ -108,100 +107,30 @@ int main()
 	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
 	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
-	unsigned int indices[] = {
-		0,1,3,
-		1,2,3
-	};
 	
-	// 顶点缓存
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
-	// 创建VAO (顶点数组对象)
-	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
-	// 创建EBO (索引缓存对象)
-	unsigned int EBO;
-	glGenBuffers(1, &EBO);
-
-	// 1. 绑定VAO
-	glBindVertexArray(VAO);
-	// 2. 把顶点数组复制到缓冲中供OpenGL使用
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// 箱子VBO
+	unsigned int boxVBO;
+	glGenBuffers(1, &boxVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	// 3. 设置EBO
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-	// 4. 设置顶点属性指针
+
+	// 创建VAO (顶点数组对象)
+	unsigned int boxVAO;
+	glGenVertexArrays(1, &boxVAO);
+	glBindVertexArray(boxVAO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	// 5. 解绑
+
+	// 光源VAO
+	unsigned int lightVAO;
+	glGenVertexArrays(1, &lightVAO);
+	glBindVertexArray(lightVAO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	//
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-
-	/* 设置纹理 */
-	// 1.创建纹理
-	unsigned int texture1, texture2;
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	// 2.设置纹理填充、插值方式
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// 3.加载纹理
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
-	if (data) {
-	// 4.使用纹理
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
-
-	// 1.创建纹理
-	glGenTextures(1, &texture2);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-	// 2.设置纹理填充、插值方式
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// 3.加载纹理
-	stbi_set_flip_vertically_on_load(true);
-	data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
-	if (data) {
-		// 4.使用纹理
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
-
-	// 设置Uniform
-	shader.use();
-	shader.setUniform("texture1", 0);
-	shader.setUniform("texture2", 1);
-
-
-	glm::vec3 cubePositions[] = {
-	  glm::vec3(0.0f,  0.0f,  0.0f),
-	  glm::vec3(2.0f,  5.0f, -15.0f),
-	  glm::vec3(-1.5f, -2.2f, -2.5f),
-	  glm::vec3(-3.8f, -2.0f, -12.3f),
-	  glm::vec3(2.4f, -0.4f, -3.5f),
-	  glm::vec3(-1.7f,  3.0f, -7.5f),
-	  glm::vec3(1.3f, -2.0f, -2.5f),
-	  glm::vec3(1.5f,  2.0f, -2.5f),
-	  glm::vec3(1.5f,  0.2f, -1.5f),
-	  glm::vec3(-1.3f,  1.0f, -1.5f)
-	};
 
 	// 渲染循环
 	while (!glfwWindowShouldClose(window)) {
@@ -214,31 +143,39 @@ int main()
 		processInput(window);
 
 		// render
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// 激活绑定纹理
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
-
+		// 画箱子
 		shader.use();
-		glBindVertexArray(VAO);
+		glBindVertexArray(boxVAO);
+		shader.setUniform("objectColor", 1.0f, 0.5f, 0.31f);
+		shader.setUniform("lightColor", 1.0f, 1.0f, 1.0f);
 
 		// 变化视角矩阵和透视矩阵
 		glm::mat4 view = camera.GetVierMatrix();
-		shader.setUniform("view", view);
 		glm::mat4 projection = glm::perspective(glm::radians(camera.zoom), (float)screenWidth / screenHeight, 0.1f, 100.0f);
+		shader.setUniform("view", view);
 		shader.setUniform("projection", projection);
 
-		for (unsigned int i = 0; i < 10; ++i) {
-			glm::mat4 model;
-			model = glm::translate(model, cubePositions[i]);
-			model = glm::rotate(model, i * glm::radians(50.0f), glm::vec3(1.0f, 0.3f, 0.5f));
-			shader.setUniform("model", model);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
+		glm::mat4 model(1.0f);
+		shader.setUniform("model", model);
+		glBindVertexArray(boxVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+		// 画光源
+		lightShader.use();
+		shader.setUniform("view", view);
+		shader.setUniform("projection", projection);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f));
+		lightShader.setUniform("model", model);
+		glBindVertexArray(lightVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		
 
 		// check & swap
 		glfwSwapBuffers(window);

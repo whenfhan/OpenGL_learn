@@ -24,6 +24,9 @@ public:
 	void setUniform(const std::string &name, bool value) const;
 	void setUniform(const std::string& name, int value) const;
 	void setUniform(const std::string& name, float value) const;
-	void setUniform(const std::string& name, glm::mat4 &value) const;
+	void setUniform(const std::string& name, glm::mat4& value) const;
+	void setUniform(const std::string& name, glm::vec3& value) const;
+	void setUniform(const std::string& name, float x, float y, float z) const;
+	void setUniform(const std::string& name, int x, int y, int z) const;
 };
 
