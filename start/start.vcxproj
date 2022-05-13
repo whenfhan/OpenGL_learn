@@ -72,13 +72,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>E:\code\VisualStudio\OpenGL_learn\start\include;D:\3rd-party\OpenGL_FW\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\3rd-party\OpenGL_FW\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>.\include;$(IncludePath)</IncludePath>
+    <LibraryPath>.\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>E:\code\VisualStudio\OpenGL_learn\start\include;D:\3rd-party\OpenGL_FW\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\3rd-party\OpenGL_FW\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>.\include;$(IncludePath)</IncludePath>
+    <LibraryPath>.\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -148,15 +148,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="glad.c" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Shader.cpp" />
+    <ClInclude Include="include\Camera.h" />
+    <ClInclude Include="include\Shader.h" />
+    <ClInclude Include="include\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="include\stb_image.h" />
-    <ClInclude Include="Shader.h" />
+    <ClCompile Include="source\Camera.cpp" />
+    <ClCompile Include="source\glad.c" />
+    <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\Shader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
