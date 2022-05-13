@@ -1,2 +1,10 @@
 ﻿  main.cpp
+E:\code\VisualStudio\Opengl_learn\start\main.cpp(209,21): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+E:\code\VisualStudio\Opengl_learn\start\main.cpp(279,11): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+E:\code\VisualStudio\Opengl_learn\start\main.cpp(280,11): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+E:\code\VisualStudio\Opengl_learn\start\main.cpp(283,16): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+E:\code\VisualStudio\Opengl_learn\start\main.cpp(284,16): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+E:\code\VisualStudio\Opengl_learn\start\main.cpp(285,10): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+E:\code\VisualStudio\Opengl_learn\start\main.cpp(286,10): warning C4244: “=”: 从“double”转换到“float”，可能丢失数据
+E:\code\VisualStudio\Opengl_learn\start\main.cpp(293,23): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
   start.vcxproj -> E:\code\VisualStudio\Opengl_learn\start\Debug\start.exe
