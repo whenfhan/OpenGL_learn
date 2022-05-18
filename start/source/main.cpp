@@ -109,6 +109,19 @@ int main()
 		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
+
+	glm::vec3 cubePositions[] = {
+	glm::vec3(0.0f,  0.0f,  0.0f),
+	glm::vec3(2.0f,  5.0f, -15.0f),
+	glm::vec3(-1.5f, -2.2f, -2.5f),
+	glm::vec3(-3.8f, -2.0f, -12.3f),
+	glm::vec3(2.4f, -0.4f, -3.5f),
+	glm::vec3(-1.7f,  3.0f, -7.5f),
+	glm::vec3(1.3f, -2.0f, -2.5f),
+	glm::vec3(1.5f,  2.0f, -2.5f),
+	glm::vec3(1.5f,  0.2f, -1.5f),
+	glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
 	
 	// 箱子VBO
 	unsigned int boxVBO;
@@ -150,9 +163,13 @@ int main()
 	shader.setUniform("material.shininess", 32.0f);
 
 	// 设置光源
+	shader.setUniform("light.position", lightPos);
 	shader.setUniform("light.ambient", 0.2f, 0.2f, 0.2f);
 	shader.setUniform("light.diffuse", 0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
 	shader.setUniform("light.specular", 1.0f, 1.0f, 1.0f);
+	shader.setUniform("light.constant", 1.0f);
+	shader.setUniform("light.linear", 0.045f);
+	shader.setUniform("light.quadratic", 0.0075f);
 
 	// 渲染循环
 	while (!glfwWindowShouldClose(window)) {
@@ -176,8 +193,8 @@ int main()
 		glBindVertexArray(boxVAO);
 		shader.setUniform("objectColor", 1.0f, 0.5f, 0.31f);
 		shader.setUniform("lightColor", 1.0f, 1.0f, 1.0f);
-		shader.setUniform("lightPos", lightPos);
 		shader.setUniform("viewPos", camera.pos);
+		shader.setUniform("light.position", lightPos);
 
 		// 变化视角矩阵和透视矩阵
 		glm::mat4 view = camera.GetVierMatrix();
@@ -197,7 +214,14 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, specMap);
 
 		glBindVertexArray(boxVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		for (int i = 0; i < 10; ++i) {
+			glm::mat4 tmpModel = glm::translate(model, cubePositions[i]);
+			tmpModel = glm::rotate(tmpModel, glm::radians(i * 20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+			shader.setUniform("model", tmpModel);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+		
 
 
 		// 画光源
