@@ -130,9 +130,21 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	//
+	// 解绑
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	// 设置材质
+	shader.use();
+	shader.setUniform("material.ambient", 1.0f, 0.5f, 0.31f);
+	shader.setUniform("material.diffuse", 1.0f, 0.5f, 0.31f);
+	shader.setUniform("material.specular", 0.5f, 0.5f, 0.5f);
+	shader.setUniform("material.shininess", 32.0f);
+
+	// 设置光源
+	shader.setUniform("light.ambient", 0.2f, 0.2f, 0.2f);
+	shader.setUniform("light.diffuse", 0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
+	shader.setUniform("light.specular", 1.0f, 1.0f, 1.0f);
 
 	// 渲染循环
 	while (!glfwWindowShouldClose(window)) {
