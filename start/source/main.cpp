@@ -163,7 +163,7 @@ int main()
 	shader.setUniform("material.shininess", 32.0f);
 
 	// 设置光源
-	shader.setUniform("light.position", lightPos);
+	//shader.setUniform("light.position", lightPos);
 	shader.setUniform("light.ambient", 0.2f, 0.2f, 0.2f);
 	shader.setUniform("light.diffuse", 0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
 	shader.setUniform("light.specular", 1.0f, 1.0f, 1.0f);
@@ -194,7 +194,10 @@ int main()
 		shader.setUniform("objectColor", 1.0f, 0.5f, 0.31f);
 		shader.setUniform("lightColor", 1.0f, 1.0f, 1.0f);
 		shader.setUniform("viewPos", camera.pos);
-		shader.setUniform("light.position", lightPos);
+		
+		shader.setUniform("light.position", camera.pos);
+		shader.setUniform("light.direction", camera.front);
+		shader.setUniform("light.cutOff", glm::cos(glm::radians(12.5f)));
 
 		// 变化视角矩阵和透视矩阵
 		glm::mat4 view = camera.GetVierMatrix();
