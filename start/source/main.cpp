@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <sstream>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -28,7 +29,6 @@ bool firstMouse = true;
 float lastX = 400, lastY = 300; // 上一张鼠标位置
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f); // 光源世界坐标系中的位置
 
 int main()
 {
@@ -111,16 +111,16 @@ int main()
 	};
 
 	glm::vec3 cubePositions[] = {
-	glm::vec3(0.0f,  0.0f,  0.0f),
-	glm::vec3(2.0f,  5.0f, -15.0f),
-	glm::vec3(-1.5f, -2.2f, -2.5f),
-	glm::vec3(-3.8f, -2.0f, -12.3f),
-	glm::vec3(2.4f, -0.4f, -3.5f),
-	glm::vec3(-1.7f,  3.0f, -7.5f),
-	glm::vec3(1.3f, -2.0f, -2.5f),
-	glm::vec3(1.5f,  2.0f, -2.5f),
-	glm::vec3(1.5f,  0.2f, -1.5f),
-	glm::vec3(-1.3f,  1.0f, -1.5f)
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 	
 	// 箱子VBO
@@ -159,21 +159,44 @@ int main()
 	shader.use();
 	shader.setUniform("material.diffuse", 0);
 	shader.setUniform("material.specular", 1);
-	shader.setUniform("material.specular", 0.5f, 0.5f, 0.5f);
 	shader.setUniform("material.shininess", 32.0f);
 
-	// 设置光源
-	//shader.setUniform("light.position", lightPos);
-	shader.setUniform("light.ambient", 0.2f, 0.2f, 0.2f);
-	shader.setUniform("light.diffuse", 0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
-	shader.setUniform("light.specular", 1.0f, 1.0f, 1.0f);
-	shader.setUniform("light.constant", 1.0f);
-	shader.setUniform("light.linear", 0.045f);
-	shader.setUniform("light.quadratic", 0.0075f);
-	shader.setUniform("light.cutOff", glm::cos(glm::radians(12.5f)));
-	shader.setUniform("light.outerCutOff", glm::cos(glm::radians(17.5f)));
-
-	// 渲染循环
+	/* 设置光源 */
+	// 1. 定向光源
+	shader.setUniform("dirLight.direction", -0.2f, -1.0f, -0.3f);
+	shader.setUniform("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+	shader.setUniform("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+	shader.setUniform("dirLight.specular", 0.5f, 0.5f, 0.5f);
+	// 2. 点光源
+	glm::vec3 pointLightPositions[] = {
+		glm::vec3(0.7f,  0.2f,  2.0f),
+		glm::vec3(2.3f, -3.3f, -4.0f),
+		glm::vec3(-4.0f,  2.0f, -12.0f),
+		glm::vec3(0.0f,  0.0f, -3.0f)
+	};
+	for (int i = 0; i < 4; ++i) {
+		std::stringstream ss;
+		ss << "pointLights[" << i << "]";
+		std::string uniformName = ss.str();
+		shader.setUniform(uniformName + ".position", pointLightPositions[i]);
+		shader.setUniform(uniformName + ".ambient", 0.05f, 0.05f, 0.05f);
+		shader.setUniform(uniformName + ".diffuse", 0.8f, 0.8f, 0.8f);
+		shader.setUniform(uniformName + ".specular", 1.0f, 1.0f, 1.0f);
+		shader.setUniform(uniformName + ".constant", 1.0f);
+		shader.setUniform(uniformName + ".linear", 0.09f);
+		shader.setUniform(uniformName + ".quadratic", 0.032f);
+	}
+	// 3.聚光源
+	shader.setUniform("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+	shader.setUniform("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+	shader.setUniform("spotLight.specular", 1.0f, 1.0f, 1.0f);
+	shader.setUniform("spotLight.constant", 1.0f);
+	shader.setUniform("spotLight.linear", 0.09f);
+	shader.setUniform("spotLight.quadratic", 0.032f);
+	shader.setUniform("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+	shader.setUniform("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+	
+	/* 渲染循环 */
 	while (!glfwWindowShouldClose(window)) {
 		// 当前渲染时间
 		float currentFram = glfwGetTime();
@@ -187,18 +210,15 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		double t = glfwGetTime();
-		lightPos.x = sin(t) + 0.5;
-
 		// 画箱子
 		shader.use();
 		glBindVertexArray(boxVAO);
 		shader.setUniform("objectColor", 1.0f, 0.5f, 0.31f);
 		shader.setUniform("lightColor", 1.0f, 1.0f, 1.0f);
 		shader.setUniform("viewPos", camera.pos);
-		
-		shader.setUniform("light.position", camera.pos);
-		shader.setUniform("light.direction", camera.front);
+
+		shader.setUniform("spotLight.position", camera.pos);
+		shader.setUniform("spotLight.direction", camera.front);
 
 		// 变化视角矩阵和透视矩阵
 		glm::mat4 view = camera.GetVierMatrix();
@@ -225,20 +245,22 @@ int main()
 			shader.setUniform("model", tmpModel);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-		
+
 
 
 		// 画光源
 		lightShader.use();
-		shader.setUniform("view", view);
-		shader.setUniform("projection", projection);
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f));
-		lightShader.setUniform("model", model);
+		lightShader.setUniform("view", view);
+		lightShader.setUniform("projection", projection);
 		glBindVertexArray(lightVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		
+		for (int i = 0; i < 4; ++i) {
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, pointLightPositions[i]);
+			model = glm::scale(model, glm::vec3(0.2f));
+			lightShader.setUniform("model", model);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 		
 
 		// check & swap
