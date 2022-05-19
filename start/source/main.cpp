@@ -170,6 +170,8 @@ int main()
 	shader.setUniform("light.constant", 1.0f);
 	shader.setUniform("light.linear", 0.045f);
 	shader.setUniform("light.quadratic", 0.0075f);
+	shader.setUniform("light.cutOff", glm::cos(glm::radians(12.5f)));
+	shader.setUniform("light.outerCutOff", glm::cos(glm::radians(17.5f)));
 
 	// 渲染循环
 	while (!glfwWindowShouldClose(window)) {
@@ -197,7 +199,6 @@ int main()
 		
 		shader.setUniform("light.position", camera.pos);
 		shader.setUniform("light.direction", camera.front);
-		shader.setUniform("light.cutOff", glm::cos(glm::radians(12.5f)));
 
 		// 变化视角矩阵和透视矩阵
 		glm::mat4 view = camera.GetVierMatrix();
