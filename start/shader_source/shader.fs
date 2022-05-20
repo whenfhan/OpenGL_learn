@@ -59,6 +59,7 @@ uniform DirLight dirLight;
 uniform PointLight pointLights[NR_POINTLIGHTS];
 uniform SpotLight spotLight;
 
+uniform sampler2D texture_diffuse1;
 
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
@@ -67,20 +68,22 @@ vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main()
 {
-    vec3 norm = normalize(Normal);
-    vec3 viewDir = normalize(viewPos - FragPos);
+    // vec3 norm = normalize(Normal);
+    // vec3 viewDir = normalize(viewPos - FragPos);
 
-    // 定向光源
-    vec3 result = calcDirLight(dirLight, norm, viewDir);
+    // // 定向光源
+    // vec3 result = calcDirLight(dirLight, norm, viewDir);
 
-    // 点光源
-    for(int i = 0; i < NR_POINTLIGHTS; ++i)
-        result += calcPointLight(pointLights[i], norm, FragPos,viewDir);
+    // // 点光源
+    // for(int i = 0; i < NR_POINTLIGHTS; ++i)
+    //     result += calcPointLight(pointLights[i], norm, FragPos,viewDir);
 
-    // 聚光源
-    result += calcSpotLight(spotLight, norm, FragPos, viewDir);
+    // // 聚光源
+    // result += calcSpotLight(spotLight, norm, FragPos, viewDir);
 
-    FragColor = vec4(result, 1.0);
+    // FragColor = vec4(result, 1.0);
+
+    FragColor = texture(texture_diffuse1, TexCoords);
 }
 
 
